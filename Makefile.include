@@ -1,0 +1,26 @@
+LIBNAME		= opencm3_stm32f1
+DEFS		+= -DSTM32F1
+
+FP_FLAGS	?= -msoft-float
+ARCH_FLAGS	= -mthumb -mcpu=cortex-m3 $(FP_FLAGS) -mfix-cortex-m3-ldrd
+
+
+# If using newlib at all:
+# LDLIBS += -lnosys
+# To use newlib-nano:
+# TGT_LDFLAGS	+= --specs=nano.specs
+# To use picolibc:
+TGT_LDFLAGS += --specs=picolibc.specs
+#TGT_LDFLAGS += --oslib=semihost
+#TGT_LDFLAGS += --oslib=dummyhost
+TGT_CFLAGS  += -DPICOLIBC_INTEGER_PRINTF_SCANF
+TGT_LDFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+
+################################################################################
+# OpenOCD specific variables
+
+OOCD		?= openocd
+OOCD_INTERFACE	?= ftdi/ft232h-module-swd
+OOCD_TARGET	?= stm32f1x
+
+include ./rules.mk
