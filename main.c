@@ -63,6 +63,12 @@ FILE picolibc_stdio = FDEV_SETUP_STREAM(picolibc_putc, NULL, NULL, _FDEV_SETUP_W
 STDIO_ALIAS(stdout);
 //STDIO_ALIAS(stderr);
 
+/*
+ * In STM32F103 SRAM boot first instruction executed is at SRAM_BASE+0x0108.
+ * It just so happens that 0x0108 corresponds to IRQ50/tim5/tim5_isr.
+ * Each IRQ vector takes 4 bytes and it's enough to fit an instruction.
+ * Instruction providing workaround is set in stm32f1-sram.ld, tim5_isr.
+ */
 
 #undef NVIC_TIM5_IRQ
 #define NVIC_TIM5_IRQ "IRQ_RESERVED_FOR_SRAM_BOOT"
