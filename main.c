@@ -81,6 +81,10 @@ int main(void)
     cm_disable_faults();
     SCB_CCR = SCB_CCR | SCB_CCR_BFHFNMIGN;
     // Read but discard value, we are only interested in BusFault
+    // In case of SRAM boot 0x10 is the first address beyond bogus MaskROM,
+    // and nothing is mapped at that address.
+    // If flash boot was used, then range 0x0000 0000 - 0x0800 0000 would be
+    // aliased to flash instead.
     MMIO32(0x10);
     SCB_CCR = SCB_CCR ^ SCB_CCR_BFHFNMIGN;
     cm_enable_faults();
