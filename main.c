@@ -84,10 +84,10 @@ int main(void)
     MMIO32(0x10);
     SCB_CCR = SCB_CCR ^ SCB_CCR_BFHFNMIGN;
     cm_enable_faults();
-    if (SCB_CFSR == 0x00008200 ) {
+    if (SCB_CFSR == SCB_CFSR_PRECISERR | SCB_CFSR_BFARVALID) {
       // BOOTx is configured for SRAM boot, as reading 0x10 caused BusFault
       // Clear BusFault we caused from CFSR
-      SCB_CFSR = 0x00008200;
+      SCB_CFSR = SCB_CFSR_PRECISERR | SCB_CFSR_BFARVALID;
       if (SCB_VTOR == 0 ) {
         // First run after reset
         // Mind that we only have bogus 16 byte vector table from MaskROM,
