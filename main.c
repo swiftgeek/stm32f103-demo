@@ -72,10 +72,11 @@ STDIO_ALIAS(stdout);
 
 #undef NVIC_TIM5_IRQ
 #define NVIC_TIM5_IRQ "IRQ_RESERVED_FOR_SRAM_BOOT"
+#define SRAM_BASE (0x20000000U)
 
 int main(void)
 {
-  if ( ( (int)main & 0x20000000 ) == 0x20000000 ) {
+  if ( ( (int)main & SRAM_BASE ) == SRAM_BASE ) {
     // Disable faults and set BFHFNMIGN to continue on a BusFault
     cm_disable_faults();
     SCB_CCR = SCB_CCR | SCB_CCR_BFHFNMIGN;
@@ -94,12 +95,12 @@ int main(void)
         // is not recommended.
         // In case of any issues, retry without SRAM boot workaround on flash,
         // with BOOTx pins set to flash boot.
-        SCB_VTOR = (1 << 29);
+        SCB_VTOR = SRAM_BASE;
         /* Initialize master stack pointer. */
          __asm__ volatile("msr msp, %0"::"g"
-            (*(volatile uint32_t *)0x20000000));
+            (*(volatile uint32_t *)SRAM_BASE));
         /* Jump to reset_handler() */
-        (*(void (**)())(0x20000000 + 4))();
+        (*(void (**)())(SRAM_BASE + 4))();
       }
     }
   }
