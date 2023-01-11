@@ -103,7 +103,7 @@ int main(void)
         /* Initialize master stack pointer. */
          __asm__ volatile("msr msp, %0"::"g"
             (*(volatile uint32_t *)SRAM_BASE));
-        /* Jump to reset_handler() */
+        /* Load address of reset_handler() from vector_table and run it */
         (*(void (**)())(SRAM_BASE + 4))();
       }
     }
