@@ -74,9 +74,9 @@ STDIO_ALIAS(stdout);
 #define NVIC_TIM5_IRQ "IRQ_RESERVED_FOR_SRAM_BOOT"
 #define SRAM_BASE (0x20000000U)
 
-int main(void)
-{
-  if ( ( (int)main & SRAM_BASE ) == SRAM_BASE ) {
+__attribute__((constructor)) static void stm32f1_sramboot_fix(void) {
+  // Confirm whether this function is located in SRAM
+  if ( ( (int)stm32f1_sramboot_fix & SRAM_BASE ) == SRAM_BASE ) {
     // Disable faults and set BFHFNMIGN to continue on a BusFault
     cm_disable_faults();
     SCB_CCR = SCB_CCR | SCB_CCR_BFHFNMIGN;
@@ -88,7 +88,7 @@ int main(void)
     MMIO32(0x10);
     SCB_CCR = SCB_CCR ^ SCB_CCR_BFHFNMIGN;
     cm_enable_faults();
-    if (SCB_CFSR == SCB_CFSR_PRECISERR | SCB_CFSR_BFARVALID) {
+    if (SCB_CFSR == (SCB_CFSR_PRECISERR | SCB_CFSR_BFARVALID) ) {
       // BOOTx is configured for SRAM boot, as reading 0x10 caused BusFault
       // Clear BusFault we caused from CFSR
       SCB_CFSR = SCB_CFSR_PRECISERR | SCB_CFSR_BFARVALID;
@@ -108,7 +108,11 @@ int main(void)
       }
     }
   }
+}
 
+
+int main(void)
+{
 //  nvic_enable_irq(NVIC_TIM5_IRQ);
 
   static uint8_t data = 'U';
